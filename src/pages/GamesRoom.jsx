@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { performLogin } from "../api/auth"; // Importando a função performLogin
-import Room from "./components/Room";
 
 const GamesRoom = () => {
   const [email, setEmail] = useState("");

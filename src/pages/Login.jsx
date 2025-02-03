@@ -1,29 +1,50 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { performLogin } from "../api/auth"; // Importando a função performLogin
+import { useDispatch, useSelector } from "react-redux";
+import { loginSuccess } from "../features/auth/authSlice";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState("");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    console.log("login");
-    const result = await performLogin(email, password);
 
-    if (result.status === "success") {
+    const data = await performLogin(email, password);
+    dispatch(loginSuccess({ token: data.token, user: data.user }));
+
+    if (data.status === "success") {
       // Redireciona o usuário ou atualiza o estado global
-      console.log("Login bem-sucedido:", result.user);
-      window.location.href = "/app"; // Redireciona para a página principal
+      console.log("Login bem-sucedido:", data.user);
+      navigate("/games-room");
     } else {
-      setError(result.message);
+      setError(data.message);
     }
 
     setLoading(false);
   };
+
+  if (user) {
+    return (
+      <div className="login-container">
+        <h1>Bem-vindo de volta, {user.name}!</h1>
+        <p>
+          Você já está logado.{" "}
+          <button onClick={() => navigate("/games-room")}>
+            Ir para a sala de jogos
+          </button>
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="login-container">

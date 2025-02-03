@@ -1,40 +1,29 @@
 import React, { useState } from "react";
-import { performRegister } from "../api/auth"; // Importando a função performRegister
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [password_confirmation, setPasswordConfirmation] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+
+  const { register, loading, error } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
 
-    // Usando a função performRegister para registrar o usuário
-    const result = await performRegister(
-      name,
-      email,
-      password,
-      password_confirmation
-    );
-
-    if (result.status === "success") {
-      // Redireciona o usuário ou atualiza o estado global
-      console.log("Registro bem-sucedido:", result.user);
-      window.location.href = "/app"; // Redireciona para a página principal
-    } else {
-      setError(result.message);
+    try {
+      await register(name, email, password, passwordConfirmation);
+      console.log("Registro bem-sucedido!");
+      navigate("/");
+    } catch (error) {
+      console.error("Erro no registro:", error);
     }
-
-    setLoading(false);
   };
 
   return (
-    <div className="register-container">
+    <div className="container register-container">
       <h1>Registro</h1>
       <form onSubmit={handleSubmit}>
         <div>
@@ -68,19 +57,23 @@ const Register = () => {
           />
         </div>
         <div>
-          <label htmlFor="password_confirmation">Senha confirmacao:</label>
+          <label htmlFor="passwordConfirmation">Confirme a Senha:</label>
           <input
             type="password"
-            id="password_confirmation"
-            value={password_confirmation}
+            id="passwordConfirmation"
+            value={passwordConfirmation}
             onChange={(e) => setPasswordConfirmation(e.target.value)}
             required
           />
         </div>
         {error && <p className="error-message">{error}</p>}
         <button type="submit" disabled={loading}>
-          {loading ? "Carregando..." : "Registrar"}
+          {loading ? "Registrando..." : "Registrar"}
         </button>
+
+        <div className="no-login">
+          <Link to="/"> Login </Link>
+        </div>
       </form>
     </div>
   );
