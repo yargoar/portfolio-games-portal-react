@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 // Função para carregar o estado inicial do localStorage
 const loadInitialState = () => {
   const token = localStorage.getItem("authToken");
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = localStorage.getItem("user");
 
   return {
     token: token || null,
@@ -18,11 +18,12 @@ const authSlice = createSlice({
     loginSuccess: (state, action) => {
       const { token, user } = action.payload;
       state.token = token;
-      state.user = user;
-      localStorage.setItem("authToken", token); // Salva o token no localStorage
-      localStorage.setItem("user", JSON.stringify(user)); // Salva os dados do usuário no localStorage
+      state.user = JSON.stringify(user);
+      localStorage.setItem("authToken", state.token); // Salva o token no localStorage
+      localStorage.setItem("user", state.user); // Salva os dados do usuário no localStorage
     },
     logout: (state) => {
+      console.log("logout", state);
       state.token = null;
       state.user = null;
       localStorage.removeItem("authToken"); // Remove o token do localStorage

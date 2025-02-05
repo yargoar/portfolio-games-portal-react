@@ -2,12 +2,14 @@
 import React from "react";
 import { createRoot } from "react-dom/client"; // Importe createRoot
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Provider } from "react-redux"; // Importa o Provider
-import { store } from "./app/store"; // Importa o store
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react"; // Importando o PersistGate
+import { store, persistor } from "./app/store"; // Importando a store e o persistor
+import "./index.css";
 import App from "./App";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import "./index.css";
+import GamesRoom from "./pages/GamesRoom";
 
 // Seleciona o elemento raiz do seu aplicativo
 const container = document.getElementById("root");
@@ -19,13 +21,18 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/app" element={<App />} />
-          <Route path="/register" element={<Register />} />
-        </Routes>
-      </Router>
+      <PersistGate loading={null} persistor={persistor}>
+        {" "}
+        {/* Pode colocar um loading aqui */}
+        <Router>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/app" element={<App />} />
+            <Route path="/games-room" element={<GamesRoom />} />
+            <Route path="/register" element={<Register />} />
+          </Routes>
+        </Router>
+      </PersistGate>
     </Provider>
   </React.StrictMode>
 );

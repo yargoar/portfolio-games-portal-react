@@ -1,81 +1,123 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { performLogin } from "../api/auth"; // Importando a função performLogin
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { performLogin } from "../api/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "../features/auth/authSlice";
+import { getRandomInt } from "../utils/common";
+import { getCurrentTimestamp } from "../utils/dateUtils";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState("");
+  const [userData, setUserData] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
 
-  const handleSubmit = async (e) => {
+  // Validação do usuário
+  useEffect(() => {
+    // Atualiza os dados do usuário se tudo estiver OK
+    const parsedUser = JSON.parse(user);
+    setUserData(parsedUser);
+    if (parsedUser) {
+      navigate("/games-room");
+    }
+  }, [user]); // Executa quando o user ou navigate mudar
+
+  const handleSubmitLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     const data = await performLogin(email, password);
-    dispatch(loginSuccess({ token: data.token, user: data.user }));
-
-    if (data.status === "success") {
+    console.log(data);
+    if (data.status === "error" || data.message) {
+      setError(handleLoginError(data));
+    } else if (data.user && data.token) {
       // Redireciona o usuário ou atualiza o estado global
-      console.log("Login bem-sucedido:", data.user);
+      dispatch(loginSuccess({ token: data.token, user: data.user }));
+
       navigate("/games-room");
-    } else {
-      setError(data.message);
     }
 
     setLoading(false);
   };
 
-  if (user) {
-    return (
-      <div className="login-container">
-        <h1>Bem-vindo de volta, {user.name}!</h1>
-        <p>
-          Você já está logado.{" "}
-          <button onClick={() => navigate("/games-room")}>
-            Ir para a sala de jogos
-          </button>
-        </p>
-      </div>
-    );
-  }
+  const handleSubmitAsVisitor = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    const tokenVisitor = "visitor";
+    const userVisitor = {
+      id: 0,
+      name: `Visitor - ${getRandomInt(12345, 98765)}`,
+      email: "visitor@visitor.com",
+      created_at: getCurrentTimestamp(),
+    };
+    dispatch(loginSuccess({ token: tokenVisitor, user: userVisitor }));
+
+    navigate("/games-room");
+
+    setLoading(false);
+  };
+
+  /**
+   * Trata erros retornados pela API.
+   * @param {Object} error - O erro retornado pela API.
+   * @returns {string} - A mensagem de erro.
+   */
+  const handleLoginError = (error) => {
+    // Extrai a mensagem de erro da resposta da API
+    if (error.errors && error.errors.email) {
+      return error.errors.email[0]; // Retorna a primeira mensagem de erro do campo "email"
+    }
+
+    return "Invalid credentials.";
+  };
 
   return (
-    <div className="login-container">
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Usuário:</label>
-          <input
-            type="text"
-            id="email"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+    <>
+      <div className="container login-container">
+        <h1>Login</h1>
+        <form onSubmit={handleSubmitLogin}>
+          <div>
+            <label htmlFor="email">Usuário:</label>
+            <input
+              type="text"
+              id="email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="password">Senha:</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <button type="submit" disabled={loading}>
+            {loading ? "Carregando..." : "Entrar"}
+          </button>
+        </form>
+        <div className="complement">
+          <Link to="/register">Sign up</Link>
         </div>
-        <div>
-          <label htmlFor="password">Senha:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        {error && <p className="error-message">{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? "Carregando..." : "Entrar"}
-        </button>
-      </form>
-    </div>
+        <form onSubmit={handleSubmitAsVisitor}>
+          <button type="submit" disabled={loading}>
+            Play as visitor
+          </button>
+        </form>
+      </div>
+      {error && <p className="error-message">{error}</p>}
+    </>
   );
 };
 
