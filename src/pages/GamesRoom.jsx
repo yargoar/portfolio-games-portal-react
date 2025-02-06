@@ -82,10 +82,14 @@ const GamesRoom = () => {
           <div className="rooms-grid">
             {rooms.map((room) => (
               <GameRoom
-                key={room.id} // Sempre use uma key única em loops
+                key={room.id || Math.random()}
+                id={room.id}
                 name={room.name}
-                players={room.players}
-                mode={room.mode}
+                players={room.players || []}
+                spectators={room.spectators || []}
+                mode={room.status}
+                loggedInUserId={userData.id} // Passando ID do usuário logado
+                loggedInUserName={userData.name} // Passando Nome do usuário logado
               />
             ))}
           </div>

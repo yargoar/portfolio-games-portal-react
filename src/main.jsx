@@ -10,6 +10,7 @@ import App from "./App";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import GamesRoom from "./pages/GamesRoom";
+import Game from "./pages/Game";
 
 // Seleciona o elemento raiz do seu aplicativo
 const container = document.getElementById("root");
@@ -29,6 +30,7 @@ root.render(
             <Route path="/" element={<Login />} />
             <Route path="/app" element={<App />} />
             <Route path="/games-room" element={<GamesRoom />} />
+            <Route path="/game" element={<Game />} />
             <Route path="/register" element={<Register />} />
           </Routes>
         </Router>

@@ -9,7 +9,7 @@ const API_URL = config.API_URL;
  * @returns {Promise<Object>} - Um objeto com o status e os dados ou a mensagem de erro.
  */
 export const performLogin = async (email, password) => {
-  const LOGIN_API_URL = `${API_URL}/api/login`;
+  const LOGIN_API_URL = `${API_URL}/login`;
 
   try {
     const response = await fetch(LOGIN_API_URL, {
@@ -134,7 +134,7 @@ export const registerUser = async (
   password,
   password_confirmation
 ) => {
-  const REGISTER_API_URL = `${API_URL}/api/register`; // URL correta
+  const REGISTER_API_URL = `${API_URL}/register`; // URL correta
   try {
     const response = await fetch(REGISTER_API_URL, {
       method: "POST",
