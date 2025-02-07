@@ -18,7 +18,11 @@ const GamesRoom = () => {
 
   // Validação do usuário
   useEffect(() => {
-    useEffectUser(user);
+    const parsedUser = JSON.parse(user);
+    setUserData(parsedUser);
+    if (!parsedUser) {
+      navigate("/");
+    }
   }, [user]); // Executa quando o user ou navigate mudar
 
   //Games room config
@@ -42,14 +46,12 @@ const GamesRoom = () => {
     fetchRooms();
   }, []);
 
-  const useEffectUser = (user) => {
-    // Atualiza os dados do usuário se tudo estiver OK
-    const parsedUser = JSON.parse(user);
-    setUserData(parsedUser);
-    if (!parsedUser) {
-      navigate("/");
-    }
-  };
+  // useEffect(() => {
+  //   const channel = echo.channel("rooms");
+  //   channel.listen("RoomUpdated", (e) => {
+  //     console.log("Evento recebido:", e);
+  //   });
+  // }, []);
 
   const handleLogout = async (e) => {
     e.preventDefault();
