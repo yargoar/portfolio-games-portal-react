@@ -39,7 +39,14 @@ export const joinRoom = async (
 ) => {
   console.log("ta joinando");
   console.log(
-    JSON.stringify({ roomId, user, userName, position, isSpectator })
+    JSON.stringify({
+      id: roomId,
+      roomId,
+      user,
+      userName,
+      position,
+      isSpectator,
+    })
   );
   const JOINROOM_API_URL = `${API_URL}/rooms/join`;
   console.log(JOINROOM_API_URL);
@@ -52,7 +59,8 @@ export const joinRoom = async (
       },
       body: JSON.stringify({ roomId, user, userName, position, isSpectator }),
     });
-
+    console.log("response.json()");
+    
     return response.json();
   } catch (error) {
     // Trata erros de conexão (API offline, CORS, etc.)

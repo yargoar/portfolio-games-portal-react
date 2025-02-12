@@ -20,7 +20,7 @@ const root = createRoot(container);
 
 // Renderiza o aplicativo dentro da raiz
 root.render(
-  <React.StrictMode>
+  //<React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         {" "}
@@ -36,5 +36,5 @@ root.render(
         </Router>
       </PersistGate>
     </Provider>
-  </React.StrictMode>
+  //</React.StrictMode>
 );

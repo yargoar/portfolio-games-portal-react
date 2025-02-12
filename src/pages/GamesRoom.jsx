@@ -5,6 +5,7 @@ import { logout } from "../features/auth/authSlice"; // Importando a ação de l
 import LogoutButton from "./components/LogoutButton"; // Componente do botão de logout
 import GameRoom from "./components/GameRoom";
 import { getRooms } from "../api/intro";
+import echo from "../echo";
 
 const GamesRoom = () => {
   const [loading, setLoading] = useState(false); // Controle de estado de carregamento
@@ -46,12 +47,30 @@ const GamesRoom = () => {
     fetchRooms();
   }, []);
 
-  // useEffect(() => {
-  //   const channel = echo.channel("rooms");
-  //   channel.listen("RoomUpdated", (e) => {
-  //     console.log("Evento recebido:", e);
-  //   });
-  // }, []);
+  useEffect(() => {
+    const channel = echo.channel("rooms");
+    const handleRoomUpdated = (e) => {
+      updateRoom(e);
+    };
+
+    channel.listen("RoomUpdated", handleRoomUpdated);
+
+    return () => {
+      channel.stopListening("RoomUpdated", handleRoomUpdated);
+    };
+  }, []);
+
+  const updateRoom = (updatedRoom) => {
+    console.log("Room received:", updatedRoom);
+    setRooms((prevRooms) => {
+      return prevRooms.map((room) =>
+        room.id === updatedRoom.id &&
+        JSON.stringify(room) !== JSON.stringify(updatedRoom)
+          ? updatedRoom
+          : room
+      );
+    });
+  };
 
   const handleLogout = async (e) => {
     e.preventDefault();
@@ -84,7 +103,6 @@ const GamesRoom = () => {
           <div className="rooms-grid">
             {rooms.map((room) => (
               <GameRoom
-                key={room.id || Math.random()}
                 id={room.id}
                 name={room.name}
                 players={room.players || []}

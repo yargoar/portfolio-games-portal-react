@@ -12,7 +12,7 @@ const GameRoom = ({
   loggedInUserName, // ID do usuário logado
 }) => {
   const navigate = useNavigate();
-
+  console.log("id: " + id);
   const placePlayers = (players) => {
     if (players[0]?.position === 0) {
       setHome(players[0] || null);
@@ -50,6 +50,8 @@ const GameRoom = ({
     );
     if (action === "join") {
       try {
+        console.log(roomId, userId, userName, action, position);
+
         const data = await joinRoom(roomId, userId, userName, position, false);
         console.log(data);
         if (data.players[0].position === 0) {
@@ -74,7 +76,7 @@ const GameRoom = ({
   return (
     <div className="game-room">
       <h2>
-        {name} (ID: {id || "Sem ID"})
+        {name} (ID: {false || "Sem ID"})
       </h2>
       <p>Modo: {mode}</p>
 
