@@ -1,6 +1,7 @@
 // features/intro/introSlice.js
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
 import { getRooms, joinRoom } from "./introService";
+import { setCurrentPage } from "../navigation/navigationSlice";
 
 // Thunk para buscar salas
 export const fetchRooms = createAsyncThunk(
@@ -85,14 +86,13 @@ const introSlice = createSlice({
         };
       })
       .addCase(attemptJoinRoom.fulfilled, (state, action) => {
-        const { roomId, position, user } = action.meta.arg;
+        const { roomId, position, user: userId } = action.meta.arg; // Extraímos o ID do usuário
+        const updatedRoom = action.payload;
 
         // 1️⃣ Desativa o loading da posição específica
         if (state.joinLoading[roomId]) {
           state.joinLoading[roomId][position] = false;
         }
-
-        const updatedRoom = action.payload;
 
         // 2️⃣ Atualiza a sala recebida
         const roomIndex = state.rooms.findIndex(
@@ -102,19 +102,28 @@ const introSlice = createSlice({
           state.rooms[roomIndex] = updatedRoom;
         }
 
-        // 3️⃣ Remove o usuário de outras salas (exceto a atual)
+        // 3️⃣ Remove o usuário de TODAS outras salas
         state.rooms = state.rooms.map((room) => {
-          if (room.id !== updatedRoom.id) {
-            return {
-              ...room,
-              players: room.players.filter((player) => player.id !== user),
-              spectators: room.spectators.filter(
-                (spectator) => spectator.id !== user
-              ),
-            };
+          if (room.id === updatedRoom.id) {
+            return room; // Mantém a sala atualizada intacta
           }
-          return room;
+
+          // Filtra jogadores e espectadores nas outras salas
+          return {
+            ...room,
+            players: room.players.filter((player) => player.id !== userId), // Remove de players
+            spectators: room.spectators.filter(
+              (spectator) => spectator.id !== userId
+            ), // Remove de spectators
+          };
         });
+
+        // Debug (opcional)
+        console.log("Salas após atualização:", current(state).rooms);
+
+        if (updatedRoom.players.length === 2) {
+          setCurrentPage("/game-table");
+        }
       })
 
       .addCase(attemptJoinRoom.rejected, (state, action) => {

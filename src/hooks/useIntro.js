@@ -50,8 +50,9 @@ export const useIntro = () => {
     }
   };
 
-  // Nova ação para atualizar uma sala específica
+  // // Nova ação para atualizar uma sala específica
   const updateRoom = (updatedRoom) => {
+    console.log("updateRoom chamou no dispatch");
     dispatch({
       type: "intro/updateRoom", // Nome da ação no slice
       payload: updatedRoom,

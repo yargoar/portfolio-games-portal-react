@@ -10,9 +10,9 @@ const Table = ({ p_room }) => {
   const { id, name, status, players = [], spectators = [] } = p_room || {};
 
   // Mantenha apenas os loadings específicos
-  const homeLoading = getJoinLoading(id, 0);
-  const awayLoading = getJoinLoading(id, 1);
-  const spectatorLoading = getJoinLoading(id, 3);
+  const homeLoading = getJoinLoading(id, 1);
+  const awayLoading = getJoinLoading(id, 2);
+  const spectatorLoading = getJoinLoading(id, 0);
 
   if (!p_room) {
     return <div>Carregando mesa...</div>;
@@ -22,8 +22,8 @@ const Table = ({ p_room }) => {
 
   // Jogadores organizados
   // Dentro do componente Table
-  const home = players.find((p) => p.position === 0) || null;
-  const away = players.find((p) => p.position === 1) || null;
+  const home = players.find((p) => p.position === 1) || null;
+  const away = players.find((p) => p.position === 2) || null;
 
   // Função para entrar na sala
   const handleJoinRoom = async (position) => {
@@ -32,7 +32,19 @@ const Table = ({ p_room }) => {
       return;
     }
 
-    const success = await joinGameRoom(id, user.id, user.name, position, false);
+    let isSpectator = false;
+
+    if (position == 0) {
+      isSpectator = true;
+    }
+
+    const success = await joinGameRoom(
+      id,
+      user.id,
+      user.name,
+      position,
+      isSpectator
+    );
 
     if (success) {
       console.log("Entrou na sala com sucesso!");
@@ -56,7 +68,7 @@ const Table = ({ p_room }) => {
           {home ? (
             <p>{home?.name || `Jogador ${home.id}`}</p>
           ) : (
-            <button onClick={() => handleJoinRoom(0)} disabled={homeLoading}>
+            <button onClick={() => handleJoinRoom(1)} disabled={homeLoading}>
               {homeLoading ? "Entrando..." : "Entrar como Jogador 1"}
             </button>
           )}
@@ -66,7 +78,7 @@ const Table = ({ p_room }) => {
           {away ? (
             <p>{away?.name || `Jogador ${away.id}`}</p>
           ) : (
-            <button onClick={() => handleJoinRoom(1)} disabled={awayLoading}>
+            <button onClick={() => handleJoinRoom(2)} disabled={awayLoading}>
               {awayLoading ? "Entrando..." : "Entrar como Jogador 2"}
             </button>
           )}
@@ -74,24 +86,24 @@ const Table = ({ p_room }) => {
       </div>
 
       {/* Espectadores */}
-      <div className="spectators">
-        <h3>Espectadores ({spectators.length}):</h3>
-        {spectators.length > 0 ? (
-          spectators.map((spectator, index) => (
-            <p key={index}>{spectator.name}</p>
-          ))
-        ) : (
-          <p>Ninguém assistindo</p>
-        )}
-      </div>
 
       {/* Entrar como espectador */}
-      {!players.some((p) => p.id === loggedInUserId) &&
-        !spectators.some((s) => s.id === loggedInUserId) && (
-          <button onClick={() => handleJoinRoom(3)} disabled={spectatorLoading}>
-            {spectatorLoading ? "Entrando..." : "Entrar como Espectador"}
-          </button>
-        )}
+
+      <div className="spectators">
+        <h5>Espectadores</h5>
+        {spectators.map((spectator) => (
+          <p key={spectator.id}>
+            blablabla
+            {spectator.name || `Espectador ${spectator.id}`}
+          </p>
+        ))}
+      </div>
+      {console.log(spectators)}
+      {!spectators.some((s) => s.id === loggedInUserId) && (
+        <button onClick={() => handleJoinRoom(0)} disabled={spectatorLoading}>
+          {spectatorLoading ? "Entrando..." : "Entrar como Espectador"}
+        </button>
+      )}
     </div>
   );
 };

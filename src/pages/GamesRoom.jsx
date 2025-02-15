@@ -9,8 +9,8 @@ const GamesRoom = () => {
 
   // Função para lidar com o evento RoomUpdated
   const handleRoomUpdated = (data) => {
-    console.log(`Games room escutou o evento`);
-    console.log(rooms);
+    console.log(`Games room escutou o evento e chamou no updateRoom`);
+    //console.log(rooms);
     updateRoom(data);
   };
 
