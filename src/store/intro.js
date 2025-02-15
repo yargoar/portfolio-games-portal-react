@@ -38,6 +38,7 @@ export const joinRoom = async (
   isSpectator = false
 ) => {
   console.log("ta joinando");
+  console.log(user);
   console.log(
     JSON.stringify({
       id: roomId,

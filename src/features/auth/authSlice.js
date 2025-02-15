@@ -1,39 +1,102 @@
-import { createSlice } from "@reduxjs/toolkit";
+// features/auth/authSlice.js
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { loginUser, registerUser } from "./authService";
 
-// Função para carregar o estado inicial do localStorage
-const loadInitialState = () => {
-  const token = localStorage.getItem("authToken");
-  const user = localStorage.getItem("user");
-
-  return {
-    token: token || null,
-    user: user || null,
-  };
+const initialState = {
+  user: JSON.parse(localStorage.getItem("user")),
+  token: localStorage.getItem("authToken"),
+  status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+  error: null,
 };
+console.log(initialState.user);
+export const login = createAsyncThunk(
+  "auth/login",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const data = await loginUser(credentials);
+      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      return data;
+    } catch (error) {
+      return rejectWithValue({
+        message: error.message,
+        status: error.status,
+        data: error.data,
+      });
+    }
+  }
+);
+
+export const register = createAsyncThunk(
+  "auth/register",
+  async (userData, { rejectWithValue }) => {
+    try {
+      const data = await registerUser(userData);
+      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      return data;
+    } catch (error) {
+      return rejectWithValue({
+        message: error.message,
+        status: error.status,
+        data: error.data,
+      });
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: loadInitialState(), // Carrega o estado inicial
+  initialState,
   reducers: {
-    loginSuccess: (state, action) => {
-      const { token, user } = action.payload;
-      state.token = token;
-      state.user = JSON.stringify(user);
-      localStorage.setItem("authToken", state.token); // Salva o token no localStorage
-      localStorage.setItem("user", state.user); // Salva os dados do usuário no localStorage
-    },
-    logout: (state) => {
-      console.log("logout", state);
-      state.token = null;
+    logout(state) {
       state.user = null;
-      localStorage.removeItem("authToken"); // Remove o token do localStorage
-      localStorage.removeItem("user"); // Remove os dados do usuário do localStorage
+      state.token = null;
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user");
     },
+    updateUser(state, action) {
+      state.user = { ...state.user, ...action.payload };
+      localStorage.setItem("user", state.user);
+    },
+    loginAsVisitor: (state, action) => {
+      state.user = action.payload;
+      state.token = `visitor-${action.payload.id}`;
+      localStorage.setItem("authToken", state.token);
+      localStorage.setItem("user", state.user);
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(login.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+      })
+      .addCase(login.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(register.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
   },
 });
 
-// Exporta as actions
-export const { loginSuccess, logout } = authSlice.actions;
-
-// Exporta o reducer
+export const { logout, updateUser, updateAuthToken, loginAsVisitor } =
+  authSlice.actions;
 export default authSlice.reducer;
