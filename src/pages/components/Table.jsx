@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { useIntro } from "../../hooks/useIntro";
 import { useAuth } from "../../hooks/useAuth";
 
