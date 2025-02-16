@@ -93,12 +93,10 @@ const Table = ({ p_room }) => {
         <h5>Espectadores</h5>
         {spectators.map((spectator) => (
           <p key={spectator.id}>
-            blablabla
             {spectator.name || `Espectador ${spectator.id}`}
           </p>
         ))}
       </div>
-      {console.log(spectators)}
       {!spectators.some((s) => s.id === loggedInUserId) && (
         <button onClick={() => handleJoinRoom(0)} disabled={spectatorLoading}>
           {spectatorLoading ? "Entrando..." : "Entrar como Espectador"}

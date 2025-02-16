@@ -52,10 +52,29 @@ const introSlice = createSlice({
   reducers: {
     updateRoom(state, action) {
       const updatedRoom = action.payload;
+
+      // 1. Atualiza a sala modificada
       const index = state.rooms.findIndex((room) => room.id === updatedRoom.id);
       if (index !== -1) {
         state.rooms[index] = updatedRoom;
       }
+
+      // 2. Coleta todos os IDs de usuário da sala atualizada
+      const userIds = [
+        ...updatedRoom.players.map((p) => p.id),
+        ...updatedRoom.spectators.map((s) => s.id),
+      ];
+
+      // 3. Remove os usuários de todas as outras salas
+      state.rooms = state.rooms.map((room) => {
+        if (room.id === updatedRoom.id) return room;
+
+        return {
+          ...room,
+          players: room.players.filter((p) => !userIds.includes(p.id)),
+          spectators: room.spectators.filter((s) => !userIds.includes(s.id)),
+        };
+      });
     },
     clearError(state) {
       state.error = null;
@@ -86,43 +105,18 @@ const introSlice = createSlice({
         };
       })
       .addCase(attemptJoinRoom.fulfilled, (state, action) => {
-        const { roomId, position, user: userId } = action.meta.arg; // Extraímos o ID do usuário
+        const { roomId, position, user: userId } = action.meta.arg;
         const updatedRoom = action.payload;
 
-        // 1️⃣ Desativa o loading da posição específica
         if (state.joinLoading[roomId]) {
           state.joinLoading[roomId][position] = false;
         }
 
-        // 2️⃣ Atualiza a sala recebida
         const roomIndex = state.rooms.findIndex(
           (room) => room.id === updatedRoom.id
         );
         if (roomIndex !== -1) {
           state.rooms[roomIndex] = updatedRoom;
-        }
-
-        // 3️⃣ Remove o usuário de TODAS outras salas
-        state.rooms = state.rooms.map((room) => {
-          if (room.id === updatedRoom.id) {
-            return room; // Mantém a sala atualizada intacta
-          }
-
-          // Filtra jogadores e espectadores nas outras salas
-          return {
-            ...room,
-            players: room.players.filter((player) => player.id !== userId), // Remove de players
-            spectators: room.spectators.filter(
-              (spectator) => spectator.id !== userId
-            ), // Remove de spectators
-          };
-        });
-
-        // Debug (opcional)
-        console.log("Salas após atualização:", current(state).rooms);
-
-        if (updatedRoom.players.length === 2) {
-          setCurrentPage("/game-table");
         }
       })
 
