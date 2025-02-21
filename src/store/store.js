@@ -5,12 +5,13 @@ import storage from "redux-persist/lib/storage";
 import authReducer from "../features/auth/authSlice";
 import introReducer from "../features/intro/introSlice";
 import navigationReducer from "../features/navigation/navigationSlice";
+import matchReducer from "../features/match/matchSlice";
 
 // Configuração do persist para auth e navigation
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth"], // Apenas auth é persistido, adicionar qualquer outro reducer a ser persistido aqui
+  whitelist: ["auth", "navigation"], // Apenas auth e navigation é persistido, adicionar qualquer outro reducer a ser persistido aqui
 };
 
 // Combinando reducers
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   intro: introReducer,
   navigation: navigationReducer,
+  match: matchReducer,
 });
 
 // Aplicando persistência ao rootReducer

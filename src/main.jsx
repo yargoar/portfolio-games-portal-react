@@ -10,6 +10,7 @@ import App from "./App";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import GamesRoom from "./pages/GamesRoom";
+import Board from "./pages/Board";
 
 // Seleciona o elemento raiz do seu aplicativo
 const container = document.getElementById("root");
@@ -27,9 +28,9 @@ root.render(
       <Router>
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/app" element={<App />} />
           <Route path="/games-room" element={<GamesRoom />} />
-          <Route path="/register" element={<Register />} />
         </Routes>
       </Router>
     </PersistGate>

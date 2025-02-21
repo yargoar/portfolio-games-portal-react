@@ -1,21 +1,28 @@
-import React, { useEffect } from "react";
-
+import React, { useEffect, useState } from "react";
 import { useIntro } from "../hooks/useIntro";
-import useRoomSocket from "../hooks/sockets/useRoomsSocket";
-import Table from "./components/Table";
+import { useAuth } from "../hooks/useAuth";
+import useIntroSocket from "../hooks/sockets/useIntroSocket";
+import Table from "./components/Table/Table";
+import Board from "./Board";
 
 const GamesRoom = () => {
-  const { rooms, loading, error, loadRooms, updateRoom } = useIntro();
+  const { rooms, loading, error, loadRooms, updateRoom, inActiveRoom } =
+    useIntro();
+  const { user } = useAuth();
 
   // Função para lidar com o evento RoomUpdated
-  const handleRoomUpdated = (data) => {
+  const handleRoomUpdated = (updatedRoom) => {
     console.log(`Games room escutou o evento e chamou no updateRoom`);
-    console.log(data);
-    updateRoom(data);
+    updateRoom(updatedRoom);
+
+    const userIds = [
+      ...updatedRoom.players.map((p) => p.id),
+      ...updatedRoom.spectators.map((s) => s.id),
+    ];
   };
 
   // Usa o hook para ouvir o evento
-  useRoomSocket(handleRoomUpdated);
+  useIntroSocket(handleRoomUpdated);
 
   useEffect(() => {
     loadRooms();
@@ -29,6 +36,10 @@ const GamesRoom = () => {
     return <div className="error">Erro: {error}</div>;
   }
 
+  console.log(inActiveRoom);
+  if (inActiveRoom) {
+    return <Board room={inActiveRoom} loggedUser={user} />;
+  }
   return (
     <div className="games-room-container">
       <h1>Salas Disponíveis ({rooms.length})</h1>

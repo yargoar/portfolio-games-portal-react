@@ -11,6 +11,7 @@ import {
   selectIntroLoading,
   selectIntroError,
   selectJoinLoadingByRoomIdAndPosition,
+  isInAnActiveRoom,
 } from "../features/intro/introSelectors";
 
 export const useIntro = () => {
@@ -18,6 +19,7 @@ export const useIntro = () => {
   const rooms = useSelector(selectRooms);
   const loading = useSelector(selectIntroLoading);
   const error = useSelector(selectIntroError);
+  const inActiveRoom = useSelector(isInAnActiveRoom);
 
   // Novo hook para obter o loading de joinRoom por sala e posição
   const getJoinLoading = (roomId, position) =>
@@ -66,6 +68,7 @@ export const useIntro = () => {
     loadRooms,
     joinGameRoom,
     updateRoom,
+    inActiveRoom,
     getJoinLoading, // Expõe a função para obter o loading de joinRoom por posição
     clearError: () => dispatch(clearError()),
   };

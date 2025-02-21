@@ -1,7 +1,7 @@
 // features/auth/authService.js
 import { config } from "../../config";
 
-const API_URL = config.API_URL;
+const API_URL = config.API_AUTH_URL;
 
 const handleResponse = async (response) => {
   const data = await response.json();

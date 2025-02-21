@@ -4,7 +4,7 @@ import {
   unsubscribeFromChannel,
 } from "../../services/socket";
 
-const useRoomSocket = (onRoomUpdated) => {
+const useIntroSocket = (onRoomUpdated) => {
   useEffect(() => {
     const channelName = "rooms";
     const eventName = ".room.updated"; // Ou o nome correto do seu evento
@@ -17,4 +17,4 @@ const useRoomSocket = (onRoomUpdated) => {
   }, [onRoomUpdated]);
 };
 
-export default useRoomSocket;
+export default useIntroSocket;

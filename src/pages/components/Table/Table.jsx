@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useIntro } from "../../hooks/useIntro";
-import { useAuth } from "../../hooks/useAuth";
+import { useIntro } from "../../../hooks/useIntro";
+import { useAuth } from "../../../hooks/useAuth";
 
 const Table = ({ p_room }) => {
   const { joinGameRoom, getJoinLoading } = useIntro();

@@ -1,7 +1,7 @@
 // features/intro/introSlice.js
 import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
 import { getRooms, joinRoom } from "./introService";
-import { setCurrentPage } from "../navigation/navigationSlice";
+import { isInAnActiveRoom } from "./introSelectors";
 
 // Thunk para buscar salas
 export const fetchRooms = createAsyncThunk(
@@ -37,6 +37,10 @@ export const attemptJoinRoom = createAsyncThunk(
     }
   }
 );
+
+export const checkActiveRoom = (state) => {
+  return isInAnActiveRoom(state);
+};
 
 const initialState = {
   rooms: [],
